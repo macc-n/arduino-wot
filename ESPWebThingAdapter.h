@@ -68,10 +68,10 @@ public:
                                       std::placeholders::_1));
 
     this->server.on("/*", HTTP_OPTIONS,
-                    std::bind(&WebThingAdapter::handleOptions, this,
+                    (ArRequestHandlerFunction)std::bind(&WebThingAdapter::handleOptions, this,
                               std::placeholders::_1));
     this->server.on("/.well-known/wot-thing-description", HTTP_GET,
-                    std::bind(&WebThingAdapter::handleThings, this,
+                    (ArRequestHandlerFunction)std::bind(&WebThingAdapter::handleThings, this,
                               std::placeholders::_1));
 
     ThingDevice *device = this->firstDevice;
@@ -82,7 +82,7 @@ public:
       while (property != nullptr) {
         String propertyBase = deviceBase + "/properties/" + property->id;
         this->server.on(propertyBase.c_str(), HTTP_GET,
-                        std::bind(&WebThingAdapter::handleThingPropertyGet,
+                        (ArRequestHandlerFunction)std::bind(&WebThingAdapter::handleThingPropertyGet,
                                   this, std::placeholders::_1, property));
         this->server.on(propertyBase.c_str(), HTTP_PUT,
                         std::bind(&WebThingAdapter::handleThingPropertyPut,
@@ -101,7 +101,7 @@ public:
       while (action != nullptr) {
         String actionBase = deviceBase + "/actions/" + action->id;
         this->server.on(actionBase.c_str(), HTTP_GET,
-                        std::bind(&WebThingAdapter::handleThingActionGet, this,
+                        (ArRequestHandlerFunction)std::bind(&WebThingAdapter::handleThingActionGet, this,
                                   std::placeholders::_1, device, action));
         this->server.on(actionBase.c_str(), HTTP_POST,
                         std::bind(&WebThingAdapter::handleThingActionPost,
@@ -112,7 +112,7 @@ public:
                                   std::placeholders::_3, std::placeholders::_4,
                                   std::placeholders::_5));
         this->server.on(actionBase.c_str(), HTTP_DELETE,
-                        std::bind(&WebThingAdapter::handleThingActionDelete,
+                        (ArRequestHandlerFunction)std::bind(&WebThingAdapter::handleThingActionDelete,
                                   this, std::placeholders::_1, device,
                                   action));
         action = (ThingAction *)action->next;
@@ -122,21 +122,21 @@ public:
       while (event != nullptr) {
         String eventBase = deviceBase + "/events/" + event->id;
         this->server.on(eventBase.c_str(), HTTP_GET,
-                        std::bind(&WebThingAdapter::handleThingEventGet, this,
+                        (ArRequestHandlerFunction)std::bind(&WebThingAdapter::handleThingEventGet, this,
                                   std::placeholders::_1, device, event));
         event = (ThingEvent *)event->next;
       }
 
       this->server.on((deviceBase + "/properties").c_str(), HTTP_GET,
-                      std::bind(&WebThingAdapter::handleThingPropertiesGet,
+                      (ArRequestHandlerFunction)std::bind(&WebThingAdapter::handleThingPropertiesGet,
                                 this, std::placeholders::_1,
                                 device->firstProperty));
 
       this->server.on((deviceBase + "/events").c_str(), HTTP_GET,
-                      std::bind(&WebThingAdapter::handleThingEventsGet, this,
+                      (ArRequestHandlerFunction)std::bind(&WebThingAdapter::handleThingEventsGet, this,
                                 std::placeholders::_1, device));
       this->server.on(deviceBase.c_str(), HTTP_GET,
-                      std::bind(&WebThingAdapter::handleThing, this,
+                      (ArRequestHandlerFunction)std::bind(&WebThingAdapter::handleThing, this,
                                 std::placeholders::_1, device));
 
       device = device->next;
@@ -200,7 +200,7 @@ private:
       return true;
     }
 
-    AsyncWebHeader *header = request->getHeader("Host");
+    const AsyncWebHeader *header = request->getHeader("Host");
     if (header == nullptr) {
       request->send(403);
       return false;

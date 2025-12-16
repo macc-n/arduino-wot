@@ -198,6 +198,8 @@ public:
     JsonArray inline_links = obj.createNestedArray("forms");
     JsonObject inline_links_prop = inline_links.createNestedObject();
     inline_links_prop["href"] = "/things/" + deviceId + "/actions/" + id;
+    inline_links_prop["op"] = "invokeaction";
+    inline_links_prop["contentType"] = "application/json";
   }
 };
 
@@ -302,6 +304,17 @@ public:
     JsonObject inline_links_prop = inline_links.createNestedObject();
     inline_links_prop["href"] =
         "/things/" + deviceId + "/" + resourceType + "/" + id;
+    inline_links_prop["contentType"] = "application/json";
+
+    if (resourceType == "properties") {
+      JsonArray ops = inline_links_prop.createNestedArray("op");
+      ops.add("readproperty");
+      if (!readOnly) {
+        ops.add("writeproperty");
+      }
+    } else if (resourceType == "events") {
+      inline_links_prop["op"] = "subscribeevent";
+    }
   }
 
   void serializeValue(JsonObject prop) {
@@ -683,9 +696,9 @@ public:
     serializeJson(message, jsonStr);
 
     // Inform all subscribed ws clients about events
-    for (AsyncWebSocketClient *client :
+    for (auto& client :
          ((AsyncWebSocket *)this->ws)->getClients()) {
-      uint32_t id = client->id();
+      uint32_t id = client.id();
 
       if (event->isSubscribed(id)) {
         ((AsyncWebSocket *)this->ws)->text(id, jsonStr);
@@ -699,7 +712,7 @@ public:
     descr["title"] = this->title;
 
     JsonArray context = descr.createNestedArray("@context");
-    context.add("https://www.w3.org/2019/wot/td/v1");
+    context.add("https://www.w3.org/2022/wot/td/v1.1");
 
     if (this->description != "") {
       descr["description"] = this->description;
@@ -735,6 +748,7 @@ public:
       context.add("readallproperties");
       context.add("writeallproperties");
       forms_prop["href"] = "/things/" + this->id + "/properties";
+      forms_prop["contentType"] = "application/json";
 
 
       #ifndef WITHOUT_WS
@@ -750,6 +764,11 @@ public:
             } else {
               forms_prop["href"] = "ws://" + ip + "/things/" + this->id;
             }
+            forms_prop["contentType"] = "application/json";
+            JsonArray ops = forms_prop.createNestedArray("op");
+            ops.add("readallproperties");
+            ops.add("writeallproperties");
+            ops.add("observeallproperties");
           }
       #endif
 

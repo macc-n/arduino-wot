@@ -1,16 +1,15 @@
 {
-  "name": "web-of-things-arduino",
-  "description": "A library for creating Web of Things TD compatible apps. Runs on ESP8266, ESP32, Ethernet, and WiFi101-compatible boards. Compatible with W3C Web of Things TD 1.0",
+  "name": "arduino-wot",
+  "description": "A library for creating Web of Things TD compatible apps. Runs on ESP8266, ESP32, Ethernet, and WiFi101-compatible boards. Compatible with W3C Web of Things TD 1.1.",
   "keywords": "Communication",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "authors": {
-    "name": "bind.systems",
-    "email": "info@desertmonitor.com",
-    "url": "https://bind.systems/tags/web-of-things/"
+    "name": "macc-n",
+    "mainteiner": true
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Citrullin/web-of-thing-arduino.git"
+    "url": "https://github.com/macc-n/arduino-wot.git"
   },
   "license": "MPL-2.0",
   "frameworks": "arduino",
